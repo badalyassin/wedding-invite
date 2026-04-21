@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Royal Wedding Invitation</title>
-  <meta name="description" content="Luxury wedding invitation with working curtain tap, scratch date reveal, confetti celebration, countdown, and music." />
+  <title>Luxury Wedding Invitation</title>
+  <meta name="description" content="Luxury wedding invitation with royal curtain, scratch date reveal, confetti, countdown and music." />
   <style>
     :root{
-      --bg:#ece8e6;
-      --paper:#f7f4f2;
-      --ink:#7b2b1f;
-      --ink-soft:#a7837b;
-      --shadow:0 14px 30px rgba(68,31,23,.12);
-      --curtain1:#7f0c07;
-      --curtain2:#b1150d;
-      --curtain3:#cb2418;
+      --bg:#120d0d;
+      --bg2:#1b1312;
+      --paper:#f7f1e8;
+      --paper-soft:#f2e7d7;
+      --text:#f8f2ea;
+      --brown:#4d3527;
+      --gold:#d4af37;
+      --gold2:#f3de9a;
+      --gold3:#a77818;
+      --line:rgba(212,175,55,.28);
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --shadow-soft:0 10px 30px rgba(0,0,0,.14);
+      --curtain1:#5e0c11;
+      --curtain2:#7d1117;
+      --curtain3:#a11b20;
     }
 
     *{box-sizing:border-box}
@@ -22,127 +29,56 @@
     body{
       margin:0;
       font-family:Georgia,"Times New Roman",serif;
-      background:var(--bg);
-      color:var(--ink);
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,.08), transparent 25%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
       overflow-x:hidden;
     }
 
-    .caps{
-      text-transform:uppercase;
-      letter-spacing:5px;
-    }
+    button,input,canvas{font:inherit}
 
-    .page{
-      width:100%;
-      min-height:100vh;
-      position:relative;
-      overflow:hidden;
-      background:var(--paper);
+    .gold-text{
+      background:linear-gradient(135deg,var(--gold2) 0%, var(--gold) 35%, #fff4c8 55%, var(--gold3) 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
     }
 
     .hero{
-      min-height:100vh;
       position:relative;
+      min-height:100vh;
+      overflow:hidden;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:linear-gradient(180deg,#f7f4f2 0%, #efe9e6 100%);
+      padding:20px;
+      isolation:isolate;
     }
 
-    .hero-inner{
-      width:min(1200px,100%);
-      min-height:100vh;
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:110px 20px 90px;
-    }
-
-    .invite-panel{
-      position:relative;
-      z-index:2;
-      width:min(760px,100%);
-      text-align:center;
-      opacity:0;
-      transform:translateY(20px);
-      transition:opacity 1s ease .45s, transform 1s ease .45s;
-      padding:0 10px;
-    }
-
-    .hero.open .invite-panel{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-    .intro-top{
-      color:var(--ink-soft);
-      font-size:15px;
-      line-height:1.9;
-      margin-bottom:24px;
-    }
-
-    .couple{
-      margin:0;
-      color:var(--ink);
-      font-style:italic;
-      font-weight:400;
-      line-height:.95;
-      font-size:clamp(3.4rem,9vw,7rem);
-    }
-
-    .amp{
-      color:var(--ink-soft);
-      font-style:italic;
-      font-size:clamp(2rem,5vw,3rem);
-      margin:16px 0;
-    }
-
-    .intro-bottom{
-      max-width:760px;
-      margin:34px auto 0;
-      color:var(--ink-soft);
-      line-height:1.9;
-      font-size:clamp(1rem,2vw,1.3rem);
-    }
-
-    .scroll-hint{
+    .hero::before{
+      content:"";
       position:absolute;
-      left:50%;
-      bottom:26px;
-      transform:translateX(-50%);
-      text-align:center;
-      z-index:3;
-      opacity:0;
-      transition:opacity 1s ease 1s;
+      inset:0;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,.05), transparent 35%),
+        linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.35));
+      pointer-events:none;
     }
 
-    .hero.open .scroll-hint{
-      opacity:1;
+    .hero-card{
+      position:relative;
+      width:min(1100px,100%);
+      min-height:88vh;
+      border:1px solid var(--line);
+      border-radius:36px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      backdrop-filter:blur(3px);
     }
 
-    .scroll-hint .label{
-      letter-spacing:7px;
-      font-size:14px;
-      text-transform:uppercase;
-      color:var(--ink);
-      margin-bottom:8px;
-    }
-
-    .scroll-hint .arrow{
-      font-size:46px;
-      line-height:1;
-      color:var(--ink);
-      animation:bounce 1.8s infinite;
-    }
-
-    @keyframes bounce{
-      0%,20%,50%,80%,100%{ transform:translateY(0); }
-      40%{ transform:translateY(8px); }
-      60%{ transform:translateY(4px); }
-    }
-
-    .curtain-wrap{
+    .curtain-layer{
       position:absolute;
       inset:0;
       z-index:5;
@@ -154,17 +90,17 @@
       top:0;
       width:52%;
       height:100%;
-      transition:transform 1.55s cubic-bezier(.2,.75,.14,1);
+      transition:transform 1.7s cubic-bezier(.2,.8,.15,1);
       background:
-        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 16%, rgba(0,0,0,.07) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.17), rgba(255,255,255,0) 16%, rgba(0,0,0,.12) 100%),
         repeating-linear-gradient(
           90deg,
           var(--curtain1) 0px,
-          var(--curtain2) 42px,
-          var(--curtain3) 58px,
-          #970f09 82px
+          var(--curtain2) 24px,
+          var(--curtain3) 46px,
+          #6b0d13 70px
         );
-      filter:drop-shadow(0 6px 14px rgba(0,0,0,.18));
+      box-shadow: inset 0 0 35px rgba(255,255,255,.05), inset 0 0 35px rgba(0,0,0,.18);
     }
 
     .curtain::before{
@@ -174,157 +110,292 @@
       background:
         repeating-linear-gradient(
           90deg,
-          rgba(255,255,255,.18) 0px,
-          rgba(255,255,255,.18) 2px,
+          rgba(255,255,255,.15) 0px,
+          rgba(255,255,255,.15) 2px,
           transparent 4px,
-          transparent 44px
+          transparent 24px
         );
-      opacity:.9;
+      opacity:.85;
       mix-blend-mode:screen;
     }
 
-    .curtain::after{content:"";
+    .curtain::after{
+      content:"";
       position:absolute;
       inset:0;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.28), transparent 28%),
-        linear-gradient(90deg, rgba(255,255,255,.06), transparent 16%, transparent 84%, rgba(0,0,0,.1));
+        radial-gradient(circle at top, rgba(255,255,255,.2), transparent 26%),
+        linear-gradient(90deg, rgba(255,255,255,.08), transparent 18%, transparent 82%, rgba(0,0,0,.12));
     }
 
     .curtain.left{
       left:0;
-      border-right:1px solid rgba(255,255,255,.14);
-      border-bottom-right-radius:84px 38px;
+      border-right:1px solid rgba(255,255,255,.12);
+      border-bottom-right-radius:100px 44px;
+      transform:translateX(0);
     }
 
     .curtain.right{
       right:0;
-      border-left:1px solid rgba(255,255,255,.14);
-      border-bottom-left-radius:84px 38px;
+      border-left:1px solid rgba(255,255,255,.12);
+      border-bottom-left-radius:100px 44px;
+      transform:translateX(0);
     }
 
-    .hero.open .curtain.left{ transform:translateX(-85%); }
-    .hero.open .curtain.right{ transform:translateX(85%); }
+    .hero.open .curtain.left{ transform:translateX(-88%); }
+    .hero.open .curtain.right{ transform:translateX(88%); }
 
-    .curtain-tie{
+    .rope{
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:4px;
+      left:50%;
+      transform:translateX(-50%);background:linear-gradient(180deg,#f6e0a0,#c69227,#f3dc9a);
+      z-index:8;
+      opacity:.88;
+      box-shadow:0 0 8px rgba(0,0,0,.25);
+    }
+
+    .seal-btn{
       position:absolute;
       left:50%;
-      top:46%;
+      top:49%;
       transform:translate(-50%,-50%);
       z-index:10;
-      width:116px;
-      height:116px;
-      border-radius:999px;
-      border:2px solid rgba(255,255,255,.28);
-      background:rgba(255,255,255,.08);
-      backdrop-filter:blur(4px);
-      box-shadow:0 8px 20px rgba(0,0,0,.18);
-      color:#fff;
+      width:126px;
+      height:126px;
+      border:none;
+      border-radius:50%;
+      cursor:pointer;
+      color:#4d3211;
+      font-weight:bold;
+      letter-spacing:1px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 32%),
+        radial-gradient(circle at center, #f6e7ad 0%, #d4af37 46%, #9a6c16 100%);
+      box-shadow:0 8px 26px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.35);
+      transition:transform .25s ease, opacity .35s ease;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+
+    .seal-btn:hover{ transform:translate(-50%,-50%) scale(1.03); }
+    .seal-btn:active{ transform:translate(-50%,-50%) scale(.98); }
+
+    .seal-inner{
+      width:100%;
+      height:100%;
+      border-radius:50%;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:9px;
-      user-select:none;
-      cursor:pointer;
-      pointer-events:auto;
-      -webkit-tap-highlight-color: transparent;
-      transition:transform .3s ease, opacity .4s ease;
-      touch-action:manipulation;
+      gap:6px;
+      padding:10px;
     }
 
-    .curtain-tie:hover{ transform:translate(-50%,-50%) scale(1.03); }
-    .curtain-tie:active{ transform:translate(-50%,-50%) scale(.98); }
+    .seal-big{
+      font-size:26px;
+      line-height:1;
+    }
 
-    .hero.open .curtain-tie{
+    .seal-small{
+      font-size:13px;
+      color:#5c3d12;
+    }
+
+    .hero.open .seal-btn{
       opacity:0;
       pointer-events:none;
       transform:translate(-50%,-50%) scale(.85);
     }
 
-    .tap-icon{
-      width:36px;
-      height:36px;
-      border:2px solid rgba(255,255,255,.55);
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      font-size:18px;
-      line-height:1;
-    }
-
-    .tap-text{
-      font-size:15px;
-      color:#f8efea;
+    .hero-content{
+      position:relative;
+      z-index:2;
+      min-height:88vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       text-align:center;
-      line-height:1.2;
+      padding:80px 20px;
     }
 
-    .section{
-      width:min(1200px, calc(100% - 36px));
+    .content-inner{
+      max-width:760px;
+      opacity:0;
+      transform:translateY(28px);
+      transition:opacity 1.2s ease .6s, transform 1.2s ease .6s;
+    }
+
+    .hero.open .content-inner{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .eyebrow{
+      font-size:13px;
+      letter-spacing:5px;
+      text-transform:uppercase;
+      color:#e9dbc2;
+      margin-bottom:16px;
+    }
+
+    .names{
+      font-size:clamp(3rem,8vw,6.4rem);
+      line-height:.95;
+      margin:0;
+      font-weight:500;
+    }
+
+    .amp{
+      margin:14px 0;
+      font-size:clamp(1.7rem,4vw,2.6rem);
+      color:#e7d3ac;
+      font-style:italic;
+    }
+
+    .hero-text{
+      margin:28px auto 0;
+      max-width:650px;
+      line-height:1.9;
+      font-size:clamp(1rem,2vw,1.22rem);
+      color:#eadfcb;
+    }
+
+    .scroll-note{
+      position:absolute;
+      left:50%;
+      bottom:24px;
+      transform:translateX(-50%);
+      z-index:2;
+      opacity:0;
+      transition:opacity .9s ease 1.2s;
+      text-align:center;
+      color:#e8dcc8;
+    }
+
+    .hero.open .scroll-note{ opacity:1; }
+
+    .scroll-note .s1{
+      font-size:12px;
+      letter-spacing:5px;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .scroll-note .s2{
+      font-size:32px;
+      animation:bounce 1.8s infinite;
+    }
+
+    @keyframes bounce{
+      0%,20%,50%,80%,100%{ transform:translateY(0); }
+      40%{ transform:translateY(7px); }
+      60%{ transform:translateY(4px); }
+    }
+
+    .section-light{
+      background:linear-gradient(180deg, #f7f0e6 0%, #efe3d2 100%);
+      color:var(--brown);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .section-light::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,.10), transparent 26%);
+      pointer-events:none;
+    }
+
+    .wrap{
+      position:relative;
+      width:min(1160px, calc(100% - 34px));
       margin:0 auto;
       padding:100px 0;
-      position:relative;
+      z-index:1;
     }
 
     .center{ text-align:center; }
 
-    .section-eyebrow{
-      color:var(--ink-soft);
-      font-size:15px;
-      margin-bottom:18px;
-      letter-spacing:1px;
-    }
-
-    .section-title{
-      margin:0;
-      font-size:clamp(3rem,7vw,5rem);
-      color:var(--ink);
-      font-style:italic;
-      font-weight:400;
-    }
-
-    .section-subtitle{
-      max-width:760px;
-      margin:18px auto 0;
-      color:var(--ink-soft);
-      line-height:1.9;
-      font-size:clamp(1rem,2vw,1.18rem);
-      letter-spacing:2px;
+    .title-small{
+      font-size:13px;
+      letter-spacing:4px;
       text-transform:uppercase;
+      color:#8d6d43;
+      margin-bottom:16px;
+    }
+
+    .title-big{
+      margin:0;
+      font-size:clamp(2.7rem,7vw,4.8rem);
+      font-weight:500;
+      font-style:italic;
+      color:#5a3d22;
+    }
+
+    .title-desc{margin:20px auto 0;
+      max-width:760px;
+      line-height:1.9;
+      font-size:1.08rem;
+      color:#8b6d54;
     }
 
     .scratch-grid{
       margin-top:54px;
       display:grid;
-      grid-template-columns:repeat(3, minmax(180px, 1fr));
+      grid-template-columns:repeat(3,minmax(180px,1fr));
       gap:28px;
-      align-items:start;
     }
 
-    .scratch-shell{
-      width:min(240px,100%);
+    .scratch-card{
+      text-align:center;
+    }
+
+    .scratch-circle{
+      width:min(260px, 100%);
       aspect-ratio:1/1;
       margin:0 auto;
       position:relative;
       border-radius:50%;
       overflow:hidden;
-      background:#fff;
-      box-shadow:var(--shadow);
-      border:10px solid rgba(255,255,255,.8);
+      box-shadow:var(--shadow-soft);
+      border:10px solid rgba(255,255,255,.75);
+      background:#fff8f0;
+    }
+
+    .scratch-reveal{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      text-align:center;
+      padding:18px;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.7), rgba(255,255,255,.15) 45%, transparent 60%),
+        linear-gradient(180deg, #fffaf3 0%, #f7efe3 100%);
+      z-index:1;
+    }
+
+    .reveal-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:4px;
+      color:#8f6f46;
+      margin-bottom:8px;
     }
 
     .reveal-value{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      font-size:clamp(2rem,5vw,3.2rem);
-      color:var(--ink);
-      background:#f8f7f6;
-      border-radius:50%;
-      user-select:none;
-      z-index:1;
+      font-size:clamp(2rem,4vw,3rem);
+      color:#5b3c1f;
+      line-height:1.1;
     }
 
     .scratch-canvas{
@@ -333,25 +404,32 @@
       width:100%;
       height:100%;
       z-index:2;
-      cursor:crosshair;
       touch-action:none;
+      cursor:crosshair;
       -webkit-user-select:none;
       user-select:none;
     }
 
-    .marry-text{
-      text-align:center;
-      margin-top:40px;
-      min-height:56px;
-      opacity:0;
-      transform:translateY(18px);
-      transition:.8s ease;
-      color:var(--ink);
-      font-style:italic;
-      font-size:clamp(2rem,5vw,3.2rem);
+    .scratch-help{
+      margin-top:16px;
+      font-size:14px;
+      color:#8c6b50;
+      letter-spacing:.3px;
     }
 
-    .marry-text.show{
+    .success-line{
+      min-height:54px;
+      margin-top:34px;
+      text-align:center;
+      font-size:clamp(1.8rem,4vw,2.8rem);
+      font-style:italic;
+      color:#6a4624;
+      opacity:0;
+      transform:translateY(16px);
+      transition:.7s ease;
+    }
+
+    .success-line.show{
       opacity:1;
       transform:translateY(0);
     }
@@ -360,347 +438,343 @@
       position:fixed;
       inset:0;
       pointer-events:none;
-      z-index:60;
       overflow:hidden;
+      z-index:100;
     }
 
-    .confetti-piece{position:absolute;
+    .confetti{
+      position:absolute;
       top:-40px;
-      border-radius:3px;
       opacity:.95;
       animation:fall linear forwards;
+      border-radius:3px;
     }
 
     @keyframes fall{
-      0%{ transform:translateY(-40px) rotate(0deg); opacity:0; }
+      0%{
+        transform:translateY(-30px) rotate(0deg);
+        opacity:0;
+      }
       10%{ opacity:1; }
-      100%{ transform:translateY(120vh) rotate(720deg); opacity:1; }
+      100%{
+        transform:translateY(120vh) rotate(760deg);
+        opacity:1;
+      }
     }
 
-    .countdown-grid{
-      margin-top:42px;
+    .count-grid{
+      margin:48px auto 0;
+      max-width:880px;
       display:grid;
-      grid-template-columns:repeat(4, minmax(120px,1fr));
-      gap:24px;
-      max-width:760px;
-      margin-left:auto;
-      margin-right:auto;
+      grid-template-columns:repeat(4, minmax(130px,1fr));
+      gap:22px;
+    }
+
+    .count-item{
+      text-align:center;
     }
 
     .count-box{
-      min-height:124px;
-      border:2px solid var(--ink);
-      border-radius:18px;
-      background:rgba(255,255,255,.35);
-      box-shadow:var(--shadow);
+      min-height:126px;
+      border-radius:24px;
       display:grid;
       place-items:center;
       font-size:clamp(2rem,4vw,3.2rem);
-      color:var(--ink);
+      color:#5c3d21;
+      background:rgba(255,255,255,.55);
+      border:1px solid rgba(212,175,55,.22);
+      box-shadow:var(--shadow-soft);
     }
 
     .count-label{
       margin-top:14px;
-      font-size:14px;
+      font-size:13px;
       letter-spacing:4px;
       text-transform:uppercase;
-      color:var(--ink);
-      text-align:center;
+      color:#846548;
     }
 
     .count-foot{
+      margin-top:30px;
       text-align:center;
-      margin-top:32px;
-      font-size:clamp(1.2rem,2vw,1.8rem);
-      color:var(--ink);
+      font-size:1.3rem;
+      color:#7d5f42;
+      font-style:italic;
     }
 
-    .venue-art{
-      margin:56px auto 28px;
-      max-width:860px;
-      width:100%;
-      padding:34px 20px;
-      background:rgba(255,255,255,.3);
-      border-radius:28px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(123,43,31,.12);
+    .venue-block{
+      margin-top:64px;
+      background:rgba(255,255,255,.42);
+      border:1px solid rgba(212,175,55,.18);
+      box-shadow:var(--shadow-soft);
+      border-radius:32px;
+      padding:42px 24px;
     }
 
-    .villa-svg{
-      width:100%;
-      height:auto;
-      display:block;
+    .venue-top{
+      font-size:12px;
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:#8b6b49;
+      text-align:center;
     }
 
     .venue-name{
-      text-align:center;
-      font-size:clamp(2.6rem,7vw,5rem);
-      line-height:1.1;
-      color:var(--ink);
       margin:18px 0 0;
+      text-align:center;
+      font-size:clamp(2.3rem,6vw,4.6rem);
+      line-height:1.05;
+      color:#5b3c20;
+      font-style:italic;
     }
 
     .venue-address{
+      margin-top:20px;
       text-align:center;
-      margin-top:22px;
-      color:var(--ink);
-      font-size:clamp(1.1rem,2vw,1.8rem);
-      letter-spacing:5px;
+      font-size:clamp(1rem,2vw,1.3rem);
+      line-height:1.8;
+      color:#7f6246;
+      letter-spacing:2px;
       text-transform:uppercase;
-      line-height:1.7;
     }
 
-    .venue-date{
+    .venue-date{margin-top:28px;
       text-align:center;
-      margin-top:42px;
-      color:var(--ink);
-      font-size:clamp(2rem,5vw,3.5rem);
-      line-height:1.3;
+      font-size:clamp(1.8rem,4vw,3rem);
+      color:#674525;
     }
 
-    .details-cards{
-      margin-top:60px;
+    .cards{
+      margin-top:42px;
       display:grid;
       grid-template-columns:repeat(3, minmax(220px,1fr));
       gap:22px;
     }
 
-    .detail-card{
-      background:rgba(255,255,255,.45);
-      border:1px solid rgba(123,43,31,.12);
-      box-shadow:var(--shadow);
-      border-radius:24px;
+    .card{
+      background:rgba(255,255,255,.56);
+      border:1px solid rgba(212,175,55,.16);
+      border-radius:26px;
       padding:28px;
+      box-shadow:var(--shadow-soft);
     }
 
-    .detail-card h3{
+    .card h3{
       margin:0 0 14px;
-      font-size:1.6rem;
-      color:var(--ink);
+      font-size:1.55rem;
       font-style:italic;
-      font-weight:400;
+      font-weight:500;
+      color:#604121;
     }
 
-    .detail-card p{
+    .card p{
       margin:0;
-      color:var(--ink-soft);
       line-height:1.9;
-      font-size:1.02rem;
+      color:#7f6248;
+      font-size:1rem;
+    }
+
+    .footer{
+      padding:36px 18px 54px;
+      text-align:center;
+      color:#8c7358;
+      font-size:15px;
+      background:linear-gradient(180deg, #efe3d2 0%, #eadbc8 100%);
     }
 
     .music-btn{
       position:fixed;
-      right:20px;
-      bottom:22px;
-      width:76px;
-      height:76px;
+      right:18px;
+      bottom:18px;
+      width:74px;
+      height:74px;
       border:none;
-      border-radius:999px;
-      background:var(--ink);
+      border-radius:50%;
+      background:#5f3f20;
       color:#fff;
-      font-size:30px;
+      font-size:28px;
       cursor:pointer;
-      z-index:70;
+      z-index:120;
       box-shadow:0 12px 24px rgba(0,0,0,.18);
-      display:grid;
-      place-items:center;
     }
 
-    .music-btn.paused{ opacity:.88; }
-
-    .footer{
-      padding:40px 20px 60px;
-      text-align:center;
-      color:var(--ink-soft);
-      font-size:15px;
-    }
+    .music-btn.paused{ opacity:.86; }
 
     @media (max-width:900px){
       .scratch-grid,
-      .countdown-grid,
-      .details-cards{
+      .count-grid,
+      .cards{
         grid-template-columns:1fr;
       }
 
-      .count-box{ min-height:100px; }
-      .hero-inner{ padding-top:100px; }
+      .count-box{ min-height:96px; }
 
-      .curtain-tie{
-        top:44%;
-        width:98px;
-        height:98px;
+      .seal-btn{
+        width:108px;
+        height:108px;
       }
 
-      .venue-address{ letter-spacing:3px; }
+      .seal-big{ font-size:22px; }
+      .seal-small{ font-size:12px; }
+
+      .venue-address{
+        letter-spacing:1px;
+      }
 
       .music-btn{
-        width:68px;
-        height:68px;
-        font-size:26px;
+        width:66px;
+        height:66px;
+        font-size:24px;
       }
     }
   </style>
 </head>
 <body>
+
   <div class="confetti-layer" id="confettiLayer"></div>
 
-  <section class="page hero" id="heroSection">
-    <div class="hero-inner">
-      <div class="invite-panel">
-        <div class="intro-top caps">You are cordially invited to celebrate the wedding of</div>
+  <section class="hero" id="hero">
+    <div class="hero-card">
+      <div class="hero-content">
+        <div class="content-inner">
+          <div class="eyebrow">Together with their families</div>
 
-        <h1 class="couple">Sam</h1>
-        <div class="amp">&amp;</div>
-        <h1 class="couple">Sofia</h1>
+          <h1 class="names">
+            <span class="gold-text">Daniel</span>
+          </h1>
+          <div class="amp">&amp;</div>
+          <h1 class="names">
+            <span class="gold-text">Sophia</span>
+          </h1>
 
-        <div class="intro-bottom">We would like to invite you to celebrate with us the most special day of our lives.
-          It would be an honor to have you present at this important moment.
+          <p class="hero-text">
+            Request the honor of your presence as they celebrate love, joy, and the beginning of their forever.
+          </p>
         </div>
       </div>
 
-      <div class="scroll-hint">
-        <div class="label">Scroll</div>
-        <div class="arrow">↓</div>
+      <div class="scroll-note">
+        <div class="s1">Scroll</div>
+        <div class="s2">↓</div>
       </div>
 
-      <div class="curtain-wrap">
+      <div class="curtain-layer">
         <div class="curtain left"></div>
         <div class="curtain right"></div>
       </div>
 
-      <button class="curtain-tie" id="openCurtainBtn" type="button" aria-label="Open invitation">
-        <div class="tap-icon">☝</div>
-        <div class="tap-text">Tap to continue</div>
+      <div class="rope"></div>
+
+      <button class="seal-btn" id="openBtn" type="button" aria-label="Open invitation">
+        <div class="seal-inner">
+          <div class="seal-big">RM</div>
+          <div class="seal-small">Tap to open</div>
+        </div>
       </button>
     </div>
   </section>
 
-  <section class="section center" id="scratchSection">
-    <div class="section-eyebrow">Scratch all three circles to continue</div>
-    <h2 class="section-title">Reveal</h2>
-    <div class="section-subtitle">Scratch to discover the date</div>
+  <section class="section-light">
+    <div class="wrap center" id="scratchSection">
+      <div class="title-small">Reveal the date</div>
+      <h2 class="title-big">Scratch To Discover</h2>
+      <p class="title-desc">
+        Scratch each golden seal with your finger to reveal the day, month, and year of the celebration.
+      </p>
 
-    <div class="scratch-grid">
-      <div class="scratch-shell">
-        <div class="reveal-value">10</div>
-        <canvas class="scratch-canvas" data-key="day"></canvas>
-      </div>
-
-      <div class="scratch-shell">
-        <div class="reveal-value">September</div>
-        <canvas class="scratch-canvas" data-key="month"></canvas>
-      </div>
-
-      <div class="scratch-shell">
-        <div class="reveal-value">2027</div>
-        <canvas class="scratch-canvas" data-key="year"></canvas>
-      </div>
-    </div>
-
-    <div class="marry-text" id="marryText">We’re getting married!</div>
-  </section>
-
-  <section class="section center" id="countdownSection">
-    <h2 class="section-title">Countdown</h2>
-
-    <div class="countdown-grid">
-      <div>
-        <div class="count-box" id="daysBox">000</div>
-        <div class="count-label">Days</div>
-      </div>
-      <div>
-        <div class="count-box" id="hoursBox">00</div>
-        <div class="count-label">Hours</div>
-      </div>
-      <div>
-        <div class="count-box" id="minsBox">00</div>
-        <div class="count-label">Min</div>
-      </div>
-      <div>
-        <div class="count-box" id="secsBox">00</div>
-        <div class="count-label">Sec</div>
-      </div>
-    </div>
-
-    <div class="count-foot">until the big day</div>
-
-    <div class="section" style="padding-bottom:20px;">
-      <div class="section-subtitle" style="max-width:none;">The celebration will take place at</div>
-
-      <div class="venue-art">
-        <svg class="villa-svg" viewBox="0 0 1000 430" xmlns="http://www.w3.org/2000/svg" fill="none">
-          <g stroke="#8a3a2a" stroke-width="3">
-            <path d="M145 250h710" />
-            <path d="M205 130l-65 45h160l-95-45Z" />
-            <path d="M795 130l65 45H700l95-45Z" />
-            <path d="M500 110l-110 70h220l-110-70Z" />
-            <rect x="165" y="175" width="120" height="120" />
-            <rect x="715" y="175" width="120" height="120" />
-            <rect x="390" y="180" width="220" height="130" />
-            <rect x="462" y="225" width="76" height="85" />
-            <rect x="190" y="200" width="26" height="95" />
-            <rect x="234" y="200" width="26" height="95" />
-            <rect x="740" y="200" width="26" height="95" />
-            <rect x="784" y="200" width="26" height="95" />
-            <rect x="418" y="205" width="36" height="42" />
-            <rect x="546" y="205" width="36" height="42" />
-            <rect x="418" y="260" width="36" height="42" />
-            <rect x="546" y="260" width="36" height="42" />
-            <path d="M475 310c8-34 42-34 50 0" />
-            <path d="M110 315c30-75 44-85 75-125" />
-            <path d="M890 315c-30-75-44-85-75-125" />
-            <path d="M130 335h740" />
-            <path d="M280 335c60 25 380 25 440 0" />
-            <path d="M160 360c110 15 570 15 680 0" />
-            <path d="M460 120v-18h80v18" />
-            <path d="M450 102h100" />
-            <path d="M490 80h20v22h-20z" />
-            <path d="M205 160v-18h60v18" />
-            <path d="M735 160v-18h60v18" />
-            <path d="M205 230h60" />
-            <path d="M735 230h60" /><path d="M408 150l20-28h40l20 28" />
-            <path d="M512 150l20-28h40l20 28" />
-            <path d="M305 335c18-48 28-82 40-122" />
-            <path d="M695 335c-18-48-28-82-40-122" />
-            <circle cx="500" cy="355" r="30" />
-          </g>
-        </svg>
-      </div>
-
-      <div class="venue-name">Villa Medicea di Artimino</div>
-      <div class="venue-address">
-        VIA DI PAPA LEONE X, 28<br />
-        ARTIMINO, FLORENCIA
-      </div>
-
-      <div class="venue-date">September 10, 2027</div>
-
-      <div class="details-cards">
-        <div class="detail-card">
-          <h3>Venue</h3>
-          <p>
-            Ceremony starts at 6:30 PM.<br />
-            Please arrive 20 minutes early.<br />
-            Elegant formal dress code.
-          </p>
+      <div class="scratch-grid">
+        <div class="scratch-card">
+          <div class="scratch-circle">
+            <div class="scratch-reveal">
+              <div class="reveal-label">Day</div>
+              <div class="reveal-value">10</div>
+            </div>
+            <canvas class="scratch-canvas" data-key="day"></canvas>
+          </div>
+          <div class="scratch-help">Scratch to reveal the day</div>
         </div>
 
-        <div class="detail-card">
-          <h3>Studio</h3>
-          <p>
-            RM Details Studio<br />
-            Wedding invitation design<br />
-            Contact: +964 750 000 0000
-          </p>
+        <div class="scratch-card">
+          <div class="scratch-circle">
+            <div class="scratch-reveal">
+              <div class="reveal-label">Month</div>
+              <div class="reveal-value">September</div>
+            </div>
+            <canvas class="scratch-canvas" data-key="month"></canvas>
+          </div><div class="scratch-help">Scratch to reveal the month</div>
         </div>
 
-        <div class="detail-card">
-          <h3>Notes</h3>
-          <p>
-            We are honored to celebrate with you.<br />
-            Kindly keep this link for event details.<br />
-            Music can be turned on or off anytime.
-          </p>
+        <div class="scratch-card">
+          <div class="scratch-circle">
+            <div class="scratch-reveal">
+              <div class="reveal-label">Year</div>
+              <div class="reveal-value">2027</div>
+            </div>
+            <canvas class="scratch-canvas" data-key="year"></canvas>
+          </div>
+          <div class="scratch-help">Scratch to reveal the year</div>
+        </div>
+      </div>
+
+      <div class="success-line" id="successLine">We’re getting married!</div>
+
+      <div class="count-grid">
+        <div class="count-item">
+          <div class="count-box" id="days">000</div>
+          <div class="count-label">Days</div>
+        </div>
+        <div class="count-item">
+          <div class="count-box" id="hours">00</div>
+          <div class="count-label">Hours</div>
+        </div>
+        <div class="count-item">
+          <div class="count-box" id="minutes">00</div>
+          <div class="count-label">Minutes</div>
+        </div>
+        <div class="count-item">
+          <div class="count-box" id="seconds">00</div>
+          <div class="count-label">Seconds</div>
+        </div>
+      </div>
+
+      <div class="count-foot">until the wedding day</div>
+
+      <div class="venue-block">
+        <div class="venue-top">The celebration will take place at</div>
+        <h3 class="venue-name">Royal Pearl Hall</h3>
+        <div class="venue-address">
+          Dream Avenue, Duhok<br>
+          Ceremony Begins at 7:00 PM
+        </div>
+        <div class="venue-date">September 10, 2027</div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Venue</h3>
+            <p>
+              Doors open 30 minutes before the ceremony.<br>
+              Elegant formal attire requested.<br>
+              We would be honored by your presence.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Studio</h3>
+            <p>
+              RM Details Studio<br>
+              Wedding Invitation Design<br>
+              Contact: +964 750 000 0000
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Notes</h3>
+            <p>
+              Please keep this invitation link for all event details.<br>
+              Music can be turned on or off anytime.<br>
+              We look forward to celebrating together.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -711,21 +785,21 @@
   </div>
 
   <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
-  <button class="music-btn paused" id="musicBtn" type="button" aria-label="Toggle music">🔊</button>
+  <button class="music-btn paused" id="musicBtn" type="button" aria-label="Toggle music">♫</button>
 
   <script>
-    const heroSection = document.getElementById('heroSection');
-    const openCurtainBtn = document.getElementById('openCurtainBtn');
+    const hero = document.getElementById('hero');
+    const openBtn = document.getElementById('openBtn');
     const scratchSection = document.getElementById('scratchSection');
     const confettiLayer = document.getElementById('confettiLayer');
-    const marryText = document.getElementById('marryText');
+    const successLine = document.getElementById('successLine');
     const music = document.getElementById('bgMusic');
     const musicBtn = document.getElementById('musicBtn');
 
-    let inviteOpened = false;
+    let opened = false;
     let musicStarted = false;
     let confettiPlayed = false;
-    const scratchDone = { day:false, month:false, year:false };
+    const scratched = { day:false, month:false, year:false };
 
     function startMusic() {
       if (musicStarted) return;
@@ -751,19 +825,18 @@
 
     musicBtn.addEventListener('click', toggleMusic);
 
-    function openCurtains() {
-      if (inviteOpened) return;
-      inviteOpened = true;
-      heroSection.classList.add('open');
+    function openInvitation() {
+      if (opened) return;
+      opened = true;
+      hero.classList.add('open');
       startMusic();
-      setTimeout(() => {
-        scratchSection.scrollIntoView({ behavior:'smooth', block:'start' });
+      setTimeout(() => {scratchSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 1450);
     }
 
-    openCurtainBtn.addEventListener('click', openCurtains);
+    openBtn.addEventListener('click', openInvitation);
 
-    function drawGoldCover(canvas) {
+    function drawGold(canvas) {
       const ctx = canvas.getContext('2d');
       const rect = canvas.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;
@@ -778,43 +851,48 @@
       const cy = h / 2;
       const radius = Math.min(w, h) / 2;
 
-      ctx.clearRect(0,0,w,h);
+      ctx.clearRect(0, 0, w, h);
 
-      const grad = ctx.createRadialGradient(cx, cy, radius * .1, cx, cy, radius);
-      grad.addColorStop(0, '#fff4c9');
-      grad.addColorStop(0.18, '#f4d483');
-      grad.addColorStop(0.42, '#d6a54f');
-      grad.addColorStop(0.68, '#f6de97');
-      grad.addColorStop(1, '#b7832f');
+      const grad = ctx.createRadialGradient(cx, cy, radius * 0.08, cx, cy, radius);
+      grad.addColorStop(0, '#fff4ca');
+      grad.addColorStop(0.18, '#f3d986');
+      grad.addColorStop(0.42, '#d4af37');
+      grad.addColorStop(0.72, '#f9e8ab');
+      grad.addColorStop(1, '#a67617');
 
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
 
-      for (let i = 0; i < 45; i++) {
+      for (let i = 0; i < 55; i++) {
         ctx.beginPath();
-        ctx.strokeStyle = rgba(255,255,255,${Math.random() * 0.08});
-        ctx.lineWidth = 1 + Math.random() * 1.4;
-        ctx.arc(cx, cy, radius * (0.28 + Math.random() * 0.6), Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+        ctx.strokeStyle = rgba(255,255,255,${Math.random() * 0.1});
+        ctx.lineWidth = 1 + Math.random() * 1.5;
+        ctx.arc(
+          cx,
+          cy,
+          radius * (0.24 + Math.random() * 0.68),
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2
+        );
         ctx.stroke();
       }
 
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 130; i++) {
+        ctx.fillStyle = rgba(255,255,255,${Math.random() * 0.12});
         ctx.beginPath();
-        ctx.strokeStyle = rgba(120,70,0,${Math.random() * 0.08});
-        ctx.lineWidth = 1 + Math.random();
-        ctx.moveTo(cx, cy);
-        const ang = Math.random() * Math.PI * 2;
-        ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
-        ctx.stroke();
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const r = Math.random() * 2.1;
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       ctx.beginPath();
       ctx.arc(cx, cy, radius - 4, 0, Math.PI * 2);
       ctx.lineWidth = 8;
-      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.strokeStyle = 'rgba(255,255,255,.33)';
       ctx.stroke();
 
       ctx.globalCompositeOperation = 'source-over';
@@ -823,22 +901,22 @@
     function setupScratch(canvas) {
       const key = canvas.dataset.key;
       const ctx = canvas.getContext('2d');
-      let isDrawing = false;
-      let scratched = false;
+      let drawing = false;
+      let finished = false;
 
       function resize() {
-        if (!scratched) drawGoldCover(canvas);
+        if (!finished) drawGold(canvas);
       }
 
-      function eventPos(event) {
+      function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         return {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
         };
       }
 
-      function eraseAt(x, y) {
+      function erase(x, y) {
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
@@ -847,76 +925,69 @@
         ctx.restore();
       }
 
-      function revealCheck() {
-        const w = canvas.width;
-        const h = canvas.height;
-        const data = ctx.getImageData(0, 0, w, h).data;
+      function checkReveal() {
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
         let transparent = 0;
-
         for (let i = 3; i < data.length; i += 4) {
           if (data[i] < 20) transparent++;
         }
-
         const percent = transparent / (data.length / 4);
-        if (percent > 0.35 && !scratched) {
-          scratched = true;
+
+        if (percent > 0.36 && !finished) {
+          finished = true;
           canvas.style.transition = 'opacity .45s ease, transform .45s ease';
           canvas.style.opacity = '0';
-          canvas.style.transform = 'scale(.96)';
+          canvas.style.transform = 'scale(.97)';
           canvas.style.pointerEvents = 'none';
-          scratchDone[key] = true;
+          scratched[key] = true;
           checkAllScratched();
         }
       }
 
-      canvas.addEventListener('pointerdown', (event) => {
-        if (scratched) return;
-        isDrawing = true;
-        if (canvas.setPointerCapture) {
-          canvas.setPointerCapture(event.pointerId);
-        }
-        const p = eventPos(event);
-        eraseAt(p.x, p.y);
+      canvas.addEventListener('pointerdown', (e) => {
+        if (finished) return;
+        drawing = true;
+        if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
+        const p = getPos(e);
+        erase(p.x, p.y);
       });
 
-      canvas.addEventListener('pointermove', (event) => {
-        if (!isDrawing || scratched) return;
-        const p = eventPos(event);
-        eraseAt(p.x, p.y);
+      canvas.addEventListener('pointermove', (e) => {
+        if (!drawing || finished) return;
+        const p = getPos(e);
+        erase(p.x, p.y);
       });
 
-      function stopDrawing() {
-        if (!isDrawing) return;
-        isDrawing = false;
-        revealCheck();
+      function stop() {
+        if (!drawing) return;
+        drawing = false;
+        checkReveal();
       }
 
-      canvas.addEventListener('pointerup', stopDrawing);
-      canvas.addEventListener('pointercancel', stopDrawing);
-      canvas.addEventListener('pointerleave', stopDrawing);
+      canvas.addEventListener('pointerup', stop);
+      canvas.addEventListener('pointercancel', stop);
+      canvas.addEventListener('pointerleave', stop);
 
       resize();
       window.addEventListener('resize', resize);
     }
 
-    function createConfettiBurst() {
+    function confettiBurst() {
       if (confettiPlayed) return;
       confettiPlayed = true;
 
-      const shapes = ['rect', 'dot'];
-      const colors = ['#7b2b1f', '#b8897f', '#d6b5ae', '#9b3c2a'];
+      const colors = ['#d4af37', '#f5df9c', '#8c1f24', '#ffffff', '#b5852f'];
 
-      for (let i = 0; i < 90; i++) {
+      for (let i = 0; i < 110; i++) {
         const piece = document.createElement('div');
-        piece.className = 'confetti-piece';
+        piece.className = 'confetti';
 
-        const shape = shapes[Math.floor(Math.random() * shapes.length)];
-        const color = colors[Math.floor(Math.random() * colors.length)];
+        const sizeW = 8 + Math.random() * 18;
+        const sizeH = 8 + Math.random() * 14;
         const left = Math.random() * 100;
-        const sizeW = shape === 'rect' ? 10 + Math.random() * 24 : 8 + Math.random() * 16;
-        const sizeH = shape === 'rect' ? 8 + Math.random() * 14 : sizeW;
-        const duration = 2.2 + Math.random() * 2.2;
-        const delay = Math.random() * .35;
+        const duration = 2.4 + Math.random() * 2.2;
+        const delay = Math.random() * 0.35;
+        const color = colors[Math.floor(Math.random() * colors.length)];
 
         piece.style.left = ${left}vw;
         piece.style.width = ${sizeW}px;
@@ -926,25 +997,23 @@
         piece.style.animationDelay = ${delay}s;
         piece.style.transform = rotate(${Math.random() * 360}deg);
 
-        if (shape === 'dot') {
-          piece.style.borderRadius = '999px';
-        }
+        if (Math.random() > 0.5) piece.style.borderRadius = '50%';
 
         confettiLayer.appendChild(piece);
-        setTimeout(() => piece.remove(), (duration + delay + .25) * 1000);
+        setTimeout(() => piece.remove(), (duration + delay + 0.2) * 1000);
       }
     }
 
     function checkAllScratched() {
-      if (scratchDone.day && scratchDone.month && scratchDone.year) {
-        createConfettiBurst();
-        marryText.classList.add('show');
+      if (scratched.day && scratched.month && scratched.year) {
+        successLine.classList.add('show');
+        confettiBurst();
       }
     }
 
     document.querySelectorAll('.scratch-canvas').forEach(setupScratch);
 
-    const targetDate = new Date('2027-09-10T18:30:00');
+    const targetDate = new Date('2027-09-10T19:00:00');
 
     function pad(n) {
       return String(n).padStart(2, '0');
@@ -955,23 +1024,23 @@
       const diff = targetDate.getTime() - now.getTime();
 
       if (diff <= 0) {
-        document.getElementById('daysBox').textContent = '000';
-        document.getElementById('hoursBox').textContent = '00';
-        document.getElementById('minsBox').textContent = '00';
-        document.getElementById('secsBox').textContent = '00';
+        document.getElementById('days').textContent = '000';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
         return;
       }
 
-      const totalSeconds = Math.floor(diff / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const mins = Math.floor((totalSeconds % 3600) / 60);
-      const secs = totalSeconds % 60;
+      const total = Math.floor(diff / 1000);
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const seconds = total % 60;
 
-      document.getElementById('daysBox').textContent = String(days).padStart(3, '0');
-      document.getElementById('hoursBox').textContent = pad(hours);
-      document.getElementById('minsBox').textContent = pad(mins);
-      document.getElementById('secsBox').textContent = pad(secs);
+      document.getElementById('days').textContent = String(days).padStart(3, '0');
+      document.getElementById('hours').textContent = pad(hours);
+      document.getElementById('minutes').textContent = pad(minutes);
+      document.getElementById('seconds').textContent = pad(seconds);
     }
 
     updateCountdown();
