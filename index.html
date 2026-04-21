@@ -1,197 +1,981 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wedding Invitation</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Royal Wedding Invitation</title>
+  <meta name="description" content="Luxury wedding invitation with working curtain tap, scratch date reveal, confetti celebration, countdown, and music." />
+  <style>
+    :root{
+      --bg:#ece8e6;
+      --paper:#f7f4f2;
+      --ink:#7b2b1f;
+      --ink-soft:#a7837b;
+      --shadow:0 14px 30px rgba(68,31,23,.12);
+      --curtain1:#7f0c07;
+      --curtain2:#b1150d;
+      --curtain3:#cb2418;
+    }
 
-<style>
-body{
-margin:0;
-font-family:Georgia, serif;
-background:#f5f2f0;
-color:#7b2b1f;
-text-align:center;
-}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      background:var(--bg);
+      color:var(--ink);
+      overflow-x:hidden;
+    }
 
-/* CURTAIN */
-.curtain{
-position:fixed;
-top:0;
-width:50%;
-height:100%;
-background:#8b0000;
-z-index:10;
-transition:1.5s;
-}
+    .caps{
+      text-transform:uppercase;
+      letter-spacing:5px;
+    }
 
-.left{left:0;}
-.right{right:0;}
+    .page{
+      width:100%;
+      min-height:100vh;
+      position:relative;
+      overflow:hidden;
+      background:var(--paper);
+    }
 
-.open .left{transform:translateX(-100%);}
-.open .right{transform:translateX(100%);}
+    .hero{
+      min-height:100vh;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#f7f4f2 0%, #efe9e6 100%);
+    }
 
-.tap{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-z-index:20;
-background:rgba(255,255,255,0.2);
-padding:20px;
-border-radius:50%;
-cursor:pointer;
-}
+    .hero-inner{
+      width:min(1200px,100%);
+      min-height:100vh;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:110px 20px 90px;
+    }
 
-/* SCRATCH */
-.circle{
-width:150px;
-height:150px;
-border-radius:50%;
-background:gold;
-margin:20px;
-display:inline-block;
-position:relative;
-}
+    .invite-panel{
+      position:relative;
+      z-index:2;
+      width:min(760px,100%);
+      text-align:center;
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 1s ease .45s, transform 1s ease .45s;
+      padding:0 10px;
+    }
 
-.circle span{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:30px;
-}
+    .hero.open .invite-panel{
+      opacity:1;
+      transform:translateY(0);
+    }
 
-canvas{
-position:absolute;
-top:0;
-left:0;
-}
+    .intro-top{
+      color:var(--ink-soft);
+      font-size:15px;
+      line-height:1.9;
+      margin-bottom:24px;
+    }
 
-/* COUNTDOWN */
-.box{
-display:inline-block;
-margin:10px;
-padding:20px;
-border:2px solid #7b2b1f;
-}
-</style>
+    .couple{
+      margin:0;
+      color:var(--ink);
+      font-style:italic;
+      font-weight:400;
+      line-height:.95;
+      font-size:clamp(3.4rem,9vw,7rem);
+    }
+
+    .amp{
+      color:var(--ink-soft);
+      font-style:italic;
+      font-size:clamp(2rem,5vw,3rem);
+      margin:16px 0;
+    }
+
+    .intro-bottom{
+      max-width:760px;
+      margin:34px auto 0;
+      color:var(--ink-soft);
+      line-height:1.9;
+      font-size:clamp(1rem,2vw,1.3rem);
+    }
+
+    .scroll-hint{
+      position:absolute;
+      left:50%;
+      bottom:26px;
+      transform:translateX(-50%);
+      text-align:center;
+      z-index:3;
+      opacity:0;
+      transition:opacity 1s ease 1s;
+    }
+
+    .hero.open .scroll-hint{
+      opacity:1;
+    }
+
+    .scroll-hint .label{
+      letter-spacing:7px;
+      font-size:14px;
+      text-transform:uppercase;
+      color:var(--ink);
+      margin-bottom:8px;
+    }
+
+    .scroll-hint .arrow{
+      font-size:46px;
+      line-height:1;
+      color:var(--ink);
+      animation:bounce 1.8s infinite;
+    }
+
+    @keyframes bounce{
+      0%,20%,50%,80%,100%{ transform:translateY(0); }
+      40%{ transform:translateY(8px); }
+      60%{ transform:translateY(4px); }
+    }
+
+    .curtain-wrap{
+      position:absolute;
+      inset:0;
+      z-index:5;
+      pointer-events:none;
+    }
+
+    .curtain{
+      position:absolute;
+      top:0;
+      width:52%;
+      height:100%;
+      transition:transform 1.55s cubic-bezier(.2,.75,.14,1);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 16%, rgba(0,0,0,.07) 100%),
+        repeating-linear-gradient(
+          90deg,
+          var(--curtain1) 0px,
+          var(--curtain2) 42px,
+          var(--curtain3) 58px,
+          #970f09 82px
+        );
+      filter:drop-shadow(0 6px 14px rgba(0,0,0,.18));
+    }
+
+    .curtain::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.18) 0px,
+          rgba(255,255,255,.18) 2px,
+          transparent 4px,
+          transparent 44px
+        );
+      opacity:.9;
+      mix-blend-mode:screen;
+    }
+
+    .curtain::after{content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.28), transparent 28%),
+        linear-gradient(90deg, rgba(255,255,255,.06), transparent 16%, transparent 84%, rgba(0,0,0,.1));
+    }
+
+    .curtain.left{
+      left:0;
+      border-right:1px solid rgba(255,255,255,.14);
+      border-bottom-right-radius:84px 38px;
+    }
+
+    .curtain.right{
+      right:0;
+      border-left:1px solid rgba(255,255,255,.14);
+      border-bottom-left-radius:84px 38px;
+    }
+
+    .hero.open .curtain.left{ transform:translateX(-85%); }
+    .hero.open .curtain.right{ transform:translateX(85%); }
+
+    .curtain-tie{
+      position:absolute;
+      left:50%;
+      top:46%;
+      transform:translate(-50%,-50%);
+      z-index:10;
+      width:116px;
+      height:116px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.28);
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(4px);
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      user-select:none;
+      cursor:pointer;
+      pointer-events:auto;
+      -webkit-tap-highlight-color: transparent;
+      transition:transform .3s ease, opacity .4s ease;
+      touch-action:manipulation;
+    }
+
+    .curtain-tie:hover{ transform:translate(-50%,-50%) scale(1.03); }
+    .curtain-tie:active{ transform:translate(-50%,-50%) scale(.98); }
+
+    .hero.open .curtain-tie{
+      opacity:0;
+      pointer-events:none;
+      transform:translate(-50%,-50%) scale(.85);
+    }
+
+    .tap-icon{
+      width:36px;
+      height:36px;
+      border:2px solid rgba(255,255,255,.55);
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      font-size:18px;
+      line-height:1;
+    }
+
+    .tap-text{
+      font-size:15px;
+      color:#f8efea;
+      text-align:center;
+      line-height:1.2;
+    }
+
+    .section{
+      width:min(1200px, calc(100% - 36px));
+      margin:0 auto;
+      padding:100px 0;
+      position:relative;
+    }
+
+    .center{ text-align:center; }
+
+    .section-eyebrow{
+      color:var(--ink-soft);
+      font-size:15px;
+      margin-bottom:18px;
+      letter-spacing:1px;
+    }
+
+    .section-title{
+      margin:0;
+      font-size:clamp(3rem,7vw,5rem);
+      color:var(--ink);
+      font-style:italic;
+      font-weight:400;
+    }
+
+    .section-subtitle{
+      max-width:760px;
+      margin:18px auto 0;
+      color:var(--ink-soft);
+      line-height:1.9;
+      font-size:clamp(1rem,2vw,1.18rem);
+      letter-spacing:2px;
+      text-transform:uppercase;
+    }
+
+    .scratch-grid{
+      margin-top:54px;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(180px, 1fr));
+      gap:28px;
+      align-items:start;
+    }
+
+    .scratch-shell{
+      width:min(240px,100%);
+      aspect-ratio:1/1;
+      margin:0 auto;
+      position:relative;
+      border-radius:50%;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:var(--shadow);
+      border:10px solid rgba(255,255,255,.8);
+    }
+
+    .reveal-value{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-size:clamp(2rem,5vw,3.2rem);
+      color:var(--ink);
+      background:#f8f7f6;
+      border-radius:50%;
+      user-select:none;
+      z-index:1;
+    }
+
+    .scratch-canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:2;
+      cursor:crosshair;
+      touch-action:none;
+      -webkit-user-select:none;
+      user-select:none;
+    }
+
+    .marry-text{
+      text-align:center;
+      margin-top:40px;
+      min-height:56px;
+      opacity:0;
+      transform:translateY(18px);
+      transition:.8s ease;
+      color:var(--ink);
+      font-style:italic;
+      font-size:clamp(2rem,5vw,3.2rem);
+    }
+
+    .marry-text.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .confetti-layer{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:60;
+      overflow:hidden;
+    }
+
+    .confetti-piece{position:absolute;
+      top:-40px;
+      border-radius:3px;
+      opacity:.95;
+      animation:fall linear forwards;
+    }
+
+    @keyframes fall{
+      0%{ transform:translateY(-40px) rotate(0deg); opacity:0; }
+      10%{ opacity:1; }
+      100%{ transform:translateY(120vh) rotate(720deg); opacity:1; }
+    }
+
+    .countdown-grid{
+      margin-top:42px;
+      display:grid;
+      grid-template-columns:repeat(4, minmax(120px,1fr));
+      gap:24px;
+      max-width:760px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .count-box{
+      min-height:124px;
+      border:2px solid var(--ink);
+      border-radius:18px;
+      background:rgba(255,255,255,.35);
+      box-shadow:var(--shadow);
+      display:grid;
+      place-items:center;
+      font-size:clamp(2rem,4vw,3.2rem);
+      color:var(--ink);
+    }
+
+    .count-label{
+      margin-top:14px;
+      font-size:14px;
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:var(--ink);
+      text-align:center;
+    }
+
+    .count-foot{
+      text-align:center;
+      margin-top:32px;
+      font-size:clamp(1.2rem,2vw,1.8rem);
+      color:var(--ink);
+    }
+
+    .venue-art{
+      margin:56px auto 28px;
+      max-width:860px;
+      width:100%;
+      padding:34px 20px;
+      background:rgba(255,255,255,.3);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(123,43,31,.12);
+    }
+
+    .villa-svg{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .venue-name{
+      text-align:center;
+      font-size:clamp(2.6rem,7vw,5rem);
+      line-height:1.1;
+      color:var(--ink);
+      margin:18px 0 0;
+    }
+
+    .venue-address{
+      text-align:center;
+      margin-top:22px;
+      color:var(--ink);
+      font-size:clamp(1.1rem,2vw,1.8rem);
+      letter-spacing:5px;
+      text-transform:uppercase;
+      line-height:1.7;
+    }
+
+    .venue-date{
+      text-align:center;
+      margin-top:42px;
+      color:var(--ink);
+      font-size:clamp(2rem,5vw,3.5rem);
+      line-height:1.3;
+    }
+
+    .details-cards{
+      margin-top:60px;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(220px,1fr));
+      gap:22px;
+    }
+
+    .detail-card{
+      background:rgba(255,255,255,.45);
+      border:1px solid rgba(123,43,31,.12);
+      box-shadow:var(--shadow);
+      border-radius:24px;
+      padding:28px;
+    }
+
+    .detail-card h3{
+      margin:0 0 14px;
+      font-size:1.6rem;
+      color:var(--ink);
+      font-style:italic;
+      font-weight:400;
+    }
+
+    .detail-card p{
+      margin:0;
+      color:var(--ink-soft);
+      line-height:1.9;
+      font-size:1.02rem;
+    }
+
+    .music-btn{
+      position:fixed;
+      right:20px;
+      bottom:22px;
+      width:76px;
+      height:76px;
+      border:none;
+      border-radius:999px;
+      background:var(--ink);
+      color:#fff;
+      font-size:30px;
+      cursor:pointer;
+      z-index:70;
+      box-shadow:0 12px 24px rgba(0,0,0,.18);
+      display:grid;
+      place-items:center;
+    }
+
+    .music-btn.paused{ opacity:.88; }
+
+    .footer{
+      padding:40px 20px 60px;
+      text-align:center;
+      color:var(--ink-soft);
+      font-size:15px;
+    }
+
+    @media (max-width:900px){
+      .scratch-grid,
+      .countdown-grid,
+      .details-cards{
+        grid-template-columns:1fr;
+      }
+
+      .count-box{ min-height:100px; }
+      .hero-inner{ padding-top:100px; }
+
+      .curtain-tie{
+        top:44%;
+        width:98px;
+        height:98px;
+      }
+
+      .venue-address{ letter-spacing:3px; }
+
+      .music-btn{
+        width:68px;
+        height:68px;
+        font-size:26px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="confetti-layer" id="confettiLayer"></div>
 
-<div class="tap" onclick="openCurtain()">Tap</div>
+  <section class="page hero" id="heroSection">
+    <div class="hero-inner">
+      <div class="invite-panel">
+        <div class="intro-top caps">You are cordially invited to celebrate the wedding of</div>
 
-<div class="curtain left"></div>
-<div class="curtain right"></div>
+        <h1 class="couple">Sam</h1>
+        <div class="amp">&amp;</div>
+        <h1 class="couple">Sofia</h1>
 
-<h1 id="names" style="margin-top:200px; opacity:0;">Sam & Sofia</h1>
+        <div class="intro-bottom">We would like to invite you to celebrate with us the most special day of our lives.
+          It would be an honor to have you present at this important moment.
+        </div>
+      </div>
 
-<div id="scratch" style="margin-top:100px;">
-<div class="circle"><span>10</span><canvas></canvas></div>
-<div class="circle"><span>Sept</span><canvas></canvas></div>
-<div class="circle"><span>2027</span><canvas></canvas></div>
-</div>
+      <div class="scroll-hint">
+        <div class="label">Scroll</div>
+        <div class="arrow">↓</div>
+      </div>
 
-<h2 id="married" style="opacity:0;">We’re getting married!</h2>
+      <div class="curtain-wrap">
+        <div class="curtain left"></div>
+        <div class="curtain right"></div>
+      </div>
 
-<div id="countdown">
-<div class="box" id="d"></div>
-<div class="box" id="h"></div>
-<div class="box" id="m"></div>
-<div class="box" id="s"></div>
-</div>
+      <button class="curtain-tie" id="openCurtainBtn" type="button" aria-label="Open invitation">
+        <div class="tap-icon">☝</div>
+        <div class="tap-text">Tap to continue</div>
+      </button>
+    </div>
+  </section>
 
-<audio id="music" src="music.mp3" loop></audio>
+  <section class="section center" id="scratchSection">
+    <div class="section-eyebrow">Scratch all three circles to continue</div>
+    <h2 class="section-title">Reveal</h2>
+    <div class="section-subtitle">Scratch to discover the date</div>
 
-<script>
+    <div class="scratch-grid">
+      <div class="scratch-shell">
+        <div class="reveal-value">10</div>
+        <canvas class="scratch-canvas" data-key="day"></canvas>
+      </div>
 
-// CURTAIN
-function openCurtain(){
-document.body.classList.add("open");
-document.getElementById("names").style.opacity=1;
-document.querySelector(".tap").style.display="none";
-document.getElementById("music").play();
-}
+      <div class="scratch-shell">
+        <div class="reveal-value">September</div>
+        <canvas class="scratch-canvas" data-key="month"></canvas>
+      </div>
 
-// SCRATCH FIX
-let scratched=0;
+      <div class="scratch-shell">
+        <div class="reveal-value">2027</div>
+        <canvas class="scratch-canvas" data-key="year"></canvas>
+      </div>
+    </div>
 
-document.querySelectorAll("canvas").forEach(canvas=>{
-let ctx=canvas.getContext("2d");
-canvas.width=150;
-canvas.height=150;
+    <div class="marry-text" id="marryText">We’re getting married!</div>
+  </section>
 
-ctx.fillStyle="gold";
-ctx.fillRect(0,0,150,150);
+  <section class="section center" id="countdownSection">
+    <h2 class="section-title">Countdown</h2>
 
-let drawing=false;
+    <div class="countdown-grid">
+      <div>
+        <div class="count-box" id="daysBox">000</div>
+        <div class="count-label">Days</div>
+      </div>
+      <div>
+        <div class="count-box" id="hoursBox">00</div>
+        <div class="count-label">Hours</div>
+      </div>
+      <div>
+        <div class="count-box" id="minsBox">00</div>
+        <div class="count-label">Min</div>
+      </div>
+      <div>
+        <div class="count-box" id="secsBox">00</div>
+        <div class="count-label">Sec</div>
+      </div>
+    </div>
 
-canvas.addEventListener("pointerdown",()=>drawing=true);
-canvas.addEventListener("pointerup",()=>{
-drawing=false;
-scratched++;
-canvas.style.display="none";
+    <div class="count-foot">until the big day</div>
 
-if(scratched==3){
-document.getElementById("married").style.opacity=1;
-confetti();
-}
-});
+    <div class="section" style="padding-bottom:20px;">
+      <div class="section-subtitle" style="max-width:none;">The celebration will take place at</div>
 
-canvas.addEventListener("pointermove",(e)=>{
-if(!drawing)return;
-ctx.globalCompositeOperation="destination-out";
-ctx.beginPath();
-ctx.arc(e.offsetX,e.offsetY,20,0,Math.PI*2);
-ctx.fill();
-});
+      <div class="venue-art">
+        <svg class="villa-svg" viewBox="0 0 1000 430" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <g stroke="#8a3a2a" stroke-width="3">
+            <path d="M145 250h710" />
+            <path d="M205 130l-65 45h160l-95-45Z" />
+            <path d="M795 130l65 45H700l95-45Z" />
+            <path d="M500 110l-110 70h220l-110-70Z" />
+            <rect x="165" y="175" width="120" height="120" />
+            <rect x="715" y="175" width="120" height="120" />
+            <rect x="390" y="180" width="220" height="130" />
+            <rect x="462" y="225" width="76" height="85" />
+            <rect x="190" y="200" width="26" height="95" />
+            <rect x="234" y="200" width="26" height="95" />
+            <rect x="740" y="200" width="26" height="95" />
+            <rect x="784" y="200" width="26" height="95" />
+            <rect x="418" y="205" width="36" height="42" />
+            <rect x="546" y="205" width="36" height="42" />
+            <rect x="418" y="260" width="36" height="42" />
+            <rect x="546" y="260" width="36" height="42" />
+            <path d="M475 310c8-34 42-34 50 0" />
+            <path d="M110 315c30-75 44-85 75-125" />
+            <path d="M890 315c-30-75-44-85-75-125" />
+            <path d="M130 335h740" />
+            <path d="M280 335c60 25 380 25 440 0" />
+            <path d="M160 360c110 15 570 15 680 0" />
+            <path d="M460 120v-18h80v18" />
+            <path d="M450 102h100" />
+            <path d="M490 80h20v22h-20z" />
+            <path d="M205 160v-18h60v18" />
+            <path d="M735 160v-18h60v18" />
+            <path d="M205 230h60" />
+            <path d="M735 230h60" /><path d="M408 150l20-28h40l20 28" />
+            <path d="M512 150l20-28h40l20 28" />
+            <path d="M305 335c18-48 28-82 40-122" />
+            <path d="M695 335c-18-48-28-82-40-122" />
+            <circle cx="500" cy="355" r="30" />
+          </g>
+        </svg>
+      </div>
 
-});
+      <div class="venue-name">Villa Medicea di Artimino</div>
+      <div class="venue-address">
+        VIA DI PAPA LEONE X, 28<br />
+        ARTIMINO, FLORENCIA
+      </div>
 
-// CONFETTI
-function confetti(){
-for(let i=0;i<50;i++){
-let div=document.createElement("div");
-div.style.position="fixed";
-div.style.width="10px";
-div.style.height="10px";
-div.style.background="#7b2b1f";
-div.style.left=Math.random()*100+"vw";
-div.style.top="-10px";
-div.style.animation="fall 2s linear";
-document.body.appendChild(div);
+      <div class="venue-date">September 10, 2027</div>
 
-setTimeout(()=>div.remove(),2000);
-}
-}
+      <div class="details-cards">
+        <div class="detail-card">
+          <h3>Venue</h3>
+          <p>
+            Ceremony starts at 6:30 PM.<br />
+            Please arrive 20 minutes early.<br />
+            Elegant formal dress code.
+          </p>
+        </div>
 
-// COUNTDOWN
-let target=new Date("Sep 10, 2027 18:30:00").getTime();
+        <div class="detail-card">
+          <h3>Studio</h3>
+          <p>
+            RM Details Studio<br />
+            Wedding invitation design<br />
+            Contact: +964 750 000 0000
+          </p>
+        </div>
 
-setInterval(()=>{
-let now=new Date().getTime();
-let diff=target-now;
+        <div class="detail-card">
+          <h3>Notes</h3>
+          <p>
+            We are honored to celebrate with you.<br />
+            Kindly keep this link for event details.<br />
+            Music can be turned on or off anytime.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-let d=Math.floor(diff/(1000*60*60*24));
-let h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-let m=Math.floor((diff%(1000*60*60))/(1000*60));
-let s=Math.floor((diff%(1000*60))/1000);
+  <div class="footer">
+    Designed with love for a timeless wedding celebration.
+  </div>
 
-document.getElementById("d").innerText=d+" Days";
-document.getElementById("h").innerText=h+" Hours";
-document.getElementById("m").innerText=m+" Min";
-document.getElementById("s").innerText=s+" Sec";
+  <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+  <button class="music-btn paused" id="musicBtn" type="button" aria-label="Toggle music">🔊</button>
 
-},1000);
+  <script>
+    const heroSection = document.getElementById('heroSection');
+    const openCurtainBtn = document.getElementById('openCurtainBtn');
+    const scratchSection = document.getElementById('scratchSection');
+    const confettiLayer = document.getElementById('confettiLayer');
+    const marryText = document.getElementById('marryText');
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
 
-</script>
+    let inviteOpened = false;
+    let musicStarted = false;
+    let confettiPlayed = false;
+    const scratchDone = { day:false, month:false, year:false };
 
-<style>
-@keyframes fall{
-to{transform:translateY(100vh);}
-}
-</style>
+    function startMusic() {
+      if (musicStarted) return;
+      music.volume = 0.55;
+      music.play().then(() => {
+        musicStarted = true;
+        musicBtn.classList.remove('paused');
+      }).catch(() => {
+        musicBtn.classList.add('paused');
+      });
+    }
 
+    function toggleMusic() {
+      if (music.paused) {
+        music.play().then(() => {
+          musicBtn.classList.remove('paused');
+        }).catch(() => {});
+      } else {
+        music.pause();
+        musicBtn.classList.add('paused');
+      }
+    }
+
+    musicBtn.addEventListener('click', toggleMusic);
+
+    function openCurtains() {
+      if (inviteOpened) return;
+      inviteOpened = true;
+      heroSection.classList.add('open');
+      startMusic();
+      setTimeout(() => {
+        scratchSection.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 1450);
+    }
+
+    openCurtainBtn.addEventListener('click', openCurtains);
+
+    function drawGoldCover(canvas) {
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      const w = rect.width;
+      const h = rect.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = Math.min(w, h) / 2;
+
+      ctx.clearRect(0,0,w,h);
+
+      const grad = ctx.createRadialGradient(cx, cy, radius * .1, cx, cy, radius);
+      grad.addColorStop(0, '#fff4c9');
+      grad.addColorStop(0.18, '#f4d483');
+      grad.addColorStop(0.42, '#d6a54f');
+      grad.addColorStop(0.68, '#f6de97');
+      grad.addColorStop(1, '#b7832f');
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      for (let i = 0; i < 45; i++) {
+        ctx.beginPath();
+        ctx.strokeStyle = rgba(255,255,255,${Math.random() * 0.08});
+        ctx.lineWidth = 1 + Math.random() * 1.4;
+        ctx.arc(cx, cy, radius * (0.28 + Math.random() * 0.6), Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.strokeStyle = rgba(120,70,0,${Math.random() * 0.08});
+        ctx.lineWidth = 1 + Math.random();
+        ctx.moveTo(cx, cy);
+        const ang = Math.random() * Math.PI * 2;
+        ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius - 4, 0, Math.PI * 2);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.stroke();
+
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function setupScratch(canvas) {
+      const key = canvas.dataset.key;
+      const ctx = canvas.getContext('2d');
+      let isDrawing = false;
+      let scratched = false;
+
+      function resize() {
+        if (!scratched) drawGoldCover(canvas);
+      }
+
+      function eventPos(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top
+        };
+      }
+
+      function eraseAt(x, y) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function revealCheck() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let transparent = 0;
+
+        for (let i = 3; i < data.length; i += 4) {
+          if (data[i] < 20) transparent++;
+        }
+
+        const percent = transparent / (data.length / 4);
+        if (percent > 0.35 && !scratched) {
+          scratched = true;
+          canvas.style.transition = 'opacity .45s ease, transform .45s ease';
+          canvas.style.opacity = '0';
+          canvas.style.transform = 'scale(.96)';
+          canvas.style.pointerEvents = 'none';
+          scratchDone[key] = true;
+          checkAllScratched();
+        }
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        if (scratched) return;
+        isDrawing = true;
+        if (canvas.setPointerCapture) {
+          canvas.setPointerCapture(event.pointerId);
+        }
+        const p = eventPos(event);
+        eraseAt(p.x, p.y);
+      });
+
+      canvas.addEventListener('pointermove', (event) => {
+        if (!isDrawing || scratched) return;
+        const p = eventPos(event);
+        eraseAt(p.x, p.y);
+      });
+
+      function stopDrawing() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        revealCheck();
+      }
+
+      canvas.addEventListener('pointerup', stopDrawing);
+      canvas.addEventListener('pointercancel', stopDrawing);
+      canvas.addEventListener('pointerleave', stopDrawing);
+
+      resize();
+      window.addEventListener('resize', resize);
+    }
+
+    function createConfettiBurst() {
+      if (confettiPlayed) return;
+      confettiPlayed = true;
+
+      const shapes = ['rect', 'dot'];
+      const colors = ['#7b2b1f', '#b8897f', '#d6b5ae', '#9b3c2a'];
+
+      for (let i = 0; i < 90; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const sizeW = shape === 'rect' ? 10 + Math.random() * 24 : 8 + Math.random() * 16;
+        const sizeH = shape === 'rect' ? 8 + Math.random() * 14 : sizeW;
+        const duration = 2.2 + Math.random() * 2.2;
+        const delay = Math.random() * .35;
+
+        piece.style.left = ${left}vw;
+        piece.style.width = ${sizeW}px;
+        piece.style.height = ${sizeH}px;
+        piece.style.background = color;
+        piece.style.animationDuration = ${duration}s;
+        piece.style.animationDelay = ${delay}s;
+        piece.style.transform = rotate(${Math.random() * 360}deg);
+
+        if (shape === 'dot') {
+          piece.style.borderRadius = '999px';
+        }
+
+        confettiLayer.appendChild(piece);
+        setTimeout(() => piece.remove(), (duration + delay + .25) * 1000);
+      }
+    }
+
+    function checkAllScratched() {
+      if (scratchDone.day && scratchDone.month && scratchDone.year) {
+        createConfettiBurst();
+        marryText.classList.add('show');
+      }
+    }
+
+    document.querySelectorAll('.scratch-canvas').forEach(setupScratch);
+
+    const targetDate = new Date('2027-09-10T18:30:00');
+
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        document.getElementById('daysBox').textContent = '000';
+        document.getElementById('hoursBox').textContent = '00';
+        document.getElementById('minsBox').textContent = '00';
+        document.getElementById('secsBox').textContent = '00';
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+
+      document.getElementById('daysBox').textContent = String(days).padStart(3, '0');
+      document.getElementById('hoursBox').textContent = pad(hours);
+      document.getElementById('minsBox').textContent = pad(mins);
+      document.getElementById('secsBox').textContent = pad(secs);
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
 </body>
 </html>
